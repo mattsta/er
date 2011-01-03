@@ -16,14 +16,14 @@
   ((c) (when (is_list c)) c)
   ((c) (when (is_atom c)) (atom_to_list c))
   ((c) (when (is_integer c)) (integer_to_list c))
-  ((c) (when (is_binary c)) (binary_to_list c)))
+  ((c) (when (is_binary c)) (: unicode characters_to_list c)))
 (defun ll
  ((c) (when (is_list c))
   (: lists map (fun l 1) c))) ;(lc ((<- element c)) (l element))))
 
 ; turn anything reasonable into a binary
 (defun b
-  ((c) (when (is_list c)) (list_to_binary c))
+  ((c) (when (is_list c)) (: unicode characters_to_binary c))
   ((c) (when (is_atom c)) (atom_to_binary c 'utf8))
   ((c) (when (is_integer c)) (b (l c)))
   ((c) (when (is_binary c)) c))
