@@ -1,5 +1,4 @@
 (eval-when-compile
- (include-file "include/utils.lfe")
  ; (caps? $A) -> true
  ; (caps? $e) -> false
  (defun caps?
@@ -32,8 +31,11 @@
 ; rambo(C, E) -> eru:er_key(<<"a">>, <<"b">>, C, <<"d">>, E, <<"f">>).
 ; i.e. anything starting with caps is an argument and everything else
 ; is presented to the key generator as-is.
-(defmacro defkey (name parts)
- (let* ((variable-parts (extract-caps parts))
-        (adjusted-list-parts (listize-parts parts variable-parts)))
- `(defun ,name ,variable-parts
-   (: eru er_key ,@adjusted-list-parts))))
+; also works with one arg: (defkey (site N)) makes: site:N(N)
+(defmacro defkey
+ ([parts] `(defkey ,(a (join-colon (ll parts))) ,parts))
+ ([name parts] (let* ((variable-parts (extract-caps parts))
+                      (adjusted-list-parts
+                       (listize-parts parts variable-parts)))
+   `(defun ,name ,variable-parts
+     (: eru er_key ,@adjusted-list-parts)))))
