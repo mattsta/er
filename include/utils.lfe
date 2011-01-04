@@ -43,9 +43,17 @@
   (: lists seq 1 n-times)))
 ;  (lc ((<- n (: lists seq 1 n-times))) (: lists flatten (: lists duplicate n what)))
 
+(defun join
+ ((c join-str) (when (andalso (is_list c) (is_list (car c))))
+  (b (: string join c join-str))))
+
 ; example: (join-colon '('"hello" '"there" '"third")) => #b("hello:there:third")
 (defun join-colon
- ((c) (when (andalso (is_list c) (is_list (car c)))) (b (: string join c '":"))))
+ ((c) (join c '":")))
+
+; example: (join-under '('"hello" '"there" '"third")) => #b("hello_there_third")
+(defun join-under
+ ((c) (join c '"_")))
 
 ; splice args into correct positions to make the er_key functions
 (defun mk-key-fun (args)

@@ -31,9 +31,11 @@
 ; rambo(C, E) -> eru:er_key(<<"a">>, <<"b">>, C, <<"d">>, E, <<"f">>).
 ; i.e. anything starting with caps is an argument and everything else
 ; is presented to the key generator as-is.
-; also works with one arg: (defkey (site N)) makes: site:N(N)
+; also works with one arg: (defkey (site N)) makes: site:N(N) and site_N(N)
 (defmacro defkey
- ([parts] `(defkey ,(a (join-colon (ll parts))) ,parts))
+ ([parts] `(progn
+            (defkey ,(a (join-under (ll parts))) ,parts)
+            (defkey ,(a (join-colon (ll parts))) ,parts)))
  ([name parts] (let* ((variable-parts (extract-caps parts))
                       (adjusted-list-parts
                        (listize-parts parts variable-parts)))
