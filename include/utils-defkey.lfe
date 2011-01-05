@@ -1,4 +1,9 @@
 (eval-when-compile
+ ; make-fns-from-args consolidates double-defkey for defkey recursive uses
+ (defun make-functions-from-args (parts)
+  `(progn
+    (defkey ,(a (join-under (ll parts))) ,parts)
+    (defkey ,(a (join-colon (ll parts))) ,parts)))
  ; (caps? $A) -> true
  ; (caps? $e) -> false
  (defun caps?
@@ -32,12 +37,35 @@
 ; i.e. anything starting with caps is an argument and everything else
 ; is presented to the key generator as-is.
 ; also works with one arg: (defkey (site N)) makes: site:N(N) and site_N(N)
+; counter keys auto-generate counter accessors:
+; (defkey (counter bob)) => counter:bob(), counter_bob(), bob:N(N), bob_N(N)
+; normal usage of defining a function name and its components:
+; (defkey zomboid (rabbit Hole)) => zomboid(Hole) = rabbit:[Hole]
+; normal usage of auto-making function name based on component names:
+; (defkey (rabbit Hole)) => rabbit(Hole) = rabbit:Hole
 (defmacro defkey
- ([parts] `(progn
-            (defkey ,(a (join-under (ll parts))) ,parts)
-            (defkey ,(a (join-colon (ll parts))) ,parts)))
+ ([('counter . (name))] `(progn
+                          ,(make-functions-from-args (list 'counter name))
+                          (defkey (,name N))))
+ ([parts] (when (is_list parts)) (make-functions-from-args parts))
  ([name parts] (let* ((variable-parts (extract-caps parts))
                       (adjusted-list-parts
                        (listize-parts parts variable-parts)))
    `(defun ,name ,variable-parts
      (: eru er_key ,@adjusted-list-parts)))))
+
+; (defkey-suite post (to tags last_update authors (comment Comment))) creates:
+; counter:post(), counter_post()
+; post:N:to(N), post_N_to(N)
+; post:N:tags(N), post_N_tags(N)
+; post:N:last_update(N), post_N_last_update(N)
+; post:N:authors(N), post_N_authors(N)
+; post:N:comment:Comment(N, Comment), post_N_comment_Comment(N, Comment)
+(defmacro defkey-suite (key subkeys)
+ `(progn
+   (defkey (counter ,key))
+   ,@(: lists map
+      (match-lambda
+       ([subkey] (when (is_atom subkey)) `(defkey (,key N ,subkey)))
+       ([subkey] (when (is_list subkey)) `(defkey (,key N ,@subkey))))
+      subkeys)))
