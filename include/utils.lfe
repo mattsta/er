@@ -3,7 +3,7 @@
   ((c) (when (is_list c)) (list_to_atom c))
   ((c) (when (is_atom c)) c)
   ((c) (when (is_integer c)) (a (l c)))
-  ((c) (when (is_binary c)) (a (binary_to_list c))))
+  ((c) (when (is_binary c))  (a (l c))))
 (defun la
  ((c) (when (andalso (is_list c) (is_list (car c))))
   (: lists map (fun a 1) c))) ;(lc ((<- element c)) (a element))))
