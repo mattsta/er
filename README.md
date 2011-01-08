@@ -38,6 +38,14 @@ to the general connection pool.
         er:set(userdb, hash_value_1, erlang:md5(<<"hash this">>).
         er:lpush(userdb, updates, hash_value_1).
 
+### Transaction support (multi/exec/discard)
+        er_pool:start_link(txn_readme_test).
+        TxnFun = fun(Cxn) ->
+                   er:setnx(Cxn, hello, there),
+                   er:incr(Cxn, "counter:uid")
+                 end,
+        er:er_transaction(txn_readme_test, TxnFun).
+
 ### Blocking Pop
 Blocking pop blocks the current process until Timeout (600 seconds below) or until
   an item becomes available.  Blocking operations return the atom nil on timeout.

@@ -354,9 +354,9 @@
 ;; Transactions ;;
 
 ; Redis atomic transactions
-(redis-cmd-m multi)
-(redis-cmd-m exec)
-(redis-cmd-m discard)
+(redis-cmd-s multi)
+(redis-cmd-o exec) ; return the redis return values without translation (?)
+(redis-cmd-s discard)
 
 ;; Publish/Subscribe  ;;
 

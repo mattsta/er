@@ -21,3 +21,18 @@
 
 (defun er_next ()
   (redis-return-strip-ok (: gen_server call client 'next 'infinity)))
+
+(defun er_transaction ((txn-fun) (when (is_function txn-fun 1))
+ (let ((safe-redis-exec
+        (lambda (client-for-txn)
+         (funcall txn-fun client-for-txn)
+         (try
+          (: er exec client-for-txn)
+          (catch
+           ; EXEC without MULTI means we had a discard command in the txn-fun
+           ((tuple 'throw (tuple 'redis_error #b("ERR EXEC without MULTI")) o)
+            'discarded)
+           ((tuple 'throw Throwed o) (throw Throwed)))))))
+ (case (: er multi client)
+  ((tuple use-cxn 'ok) (funcall safe-redis-exec use-cxn))
+  ('ok (funcall safe-redis-exec client))))))

@@ -7,11 +7,13 @@
 redis_setup_clean() ->
   TestModule = er_redis,
   {ok, Cxn} = TestModule:start_link("127.0.0.1", 6991),
+  {ok, _PoolPid} = er_pool:start_link(testing_pool, "127.0.0.1", 6991),
   ok = er:flushall(Cxn),
   Cxn.
 
 redis_cleanup(Cxn) ->
-  Cxn ! shutdown.
+  Cxn ! shutdown,
+  testing_pool ! shutdown.
 
 er_basic_commands_test_() ->
   {setup,
@@ -334,13 +336,35 @@ er_transactions_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(_C) -> 
+    fun(IndividualRedis) ->
+      TxnA = fun(C) ->
+               queued = er:setnx(C, bob, four),
+               queued = er:setnx(C, bob, three)
+             end,
+      TxnB = fun(C) ->
+               er:incr(C, bob),
+               er:setnx(C, bob, three)
+             end,
+      TxnC = fun(C) ->
+               queued = er:incr(C, incrementer),
+               er:discard(C)
+             end,
       [
-        % multi
-        % exec
-        % discard
-        % watch
-        % unwatch
+        % 1 = success, 0 = failure for setnx
+        ?_E([1, 0], er:er_transaction(testing_pool, TxnA)),
+        ?_E([0, 0], er:er_transaction(IndividualRedis, TxnA)),
+        % Errors during a MULTI are thrown.  Since the entire multi wasn't run,
+        % we don't care about the individual statuses from other returns.
+        ?_assertException(throw,
+          {redis_error,<<"ERR value is not an integer or out of range">>},
+          er:er_transaction(testing_pool, TxnB)),
+        ?_assertException(throw,
+          {redis_error,<<"ERR value is not an integer or out of range">>},
+          er:er_transaction(IndividualRedis, TxnB)),
+        ?_E(discarded, er:er_transaction(testing_pool, TxnC)),
+        ?_E(discarded, er:er_transaction(IndividualRedis, TxnC))
+        % watch -- test concurrently
+        % unwatch -- test concurrently
       ]
     end
   }.
