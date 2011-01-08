@@ -66,8 +66,11 @@ handle_call({cmd, Parts}, From,
   {noreply, State#state{available = [connect(State)|T], reserved = [H | R]}};
 
 % Blocking list ops *do* block, but don't need to return their er_redis pid
+% Transactional returns should self-clean-up
 handle_call({cmd, Parts}, From,
     #state{available = [H|T], reserved = R} = State) when
+    hd(Parts) =:= <<"exec">> orelse
+    hd(Parts) =:= <<"discard">> orelse
     hd(Parts) =:= <<"blpop">> orelse
     hd(Parts) =:= <<"brpoplpush">> orelse
     hd(Parts) =:= <<"brpop">> ->
@@ -117,14 +120,15 @@ handle_info({'EXIT', Pid, _Reason},
             NewAvail = [connect(State) | RemovedOld],
             {noreply, State#state{available=NewAvail}};
     false -> RemovedOld = Reserved -- [Pid],
-             {noreply, State#state{reserved = RemovedOld}}
+             NewAvail = [connect(State) | Available],
+             {noreply, State#state{available = NewAvail, reserved = RemovedOld}}
   end;
 
 handle_info(shutdown,
     #state{available=Available, reserved=Reserved} = State) ->
   [P ! shutdown || P <- Available],
   [P ! shutdown || P <- Reserved],
-  {noreply, State#state{available=[],reserved=[]}};
+  {stop, normal, State#state{available=[],reserved=[]}};
 
 handle_info(Info, State) ->
   error_logger:error_msg("Other info: ~p with state ~p~n", [Info, State]),
