@@ -25,6 +25,14 @@
 ; simple password authentication if enabled
 (redis-cmd-s auth)
 
+;; Connection commands ;;
+
+; ping the server
+(redis-cmd-s ping)
+
+; echo the given string
+(redis-cmd-b echo (_msg_))
+
 ;; Commands operating on all the kind of values ;;
 
 ; test if a key exists
@@ -376,6 +384,9 @@
 
 ; Asynchronously save the DB on disk
 (redis-cmd-s bgsave)
+
+; Get and/or set configuration parameters
+(redis-cmd-s config (_getset_ _params_and_or_values_))
 
 ; Return the UNIX time stamp of the last successfully saving of the dataset on disk
 (redis-cmd-i lastsave)

@@ -403,8 +403,10 @@ er_server_control_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(_C) -> 
+    fun(C) ->
       [
+        ?_E(pong, er:ping(C)),
+        ?_E(<<"hello there">>, er:echo(C, "hello there"))
         % info
         % monitor
         % slaveof
