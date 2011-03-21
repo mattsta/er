@@ -152,23 +152,29 @@ er_lists_commands_test_() ->
         ?_E([], er:lrange(C, listA, 10, 20)),
         ?_E(7, er:lpushx(C, listA, aitem7)),
         % aitem7, aitem6, aitem5, aitem4, aitem1, aitem2, aitem3
-        ?_E(8, er:rpushx(C, listA, aitem3)),
-        % aitem7, aitem6, aitem5, aitem4, aitem1, aitem2, aitem3
+        ?_E(8, er:rpushx(C, listA, aitem3nd)),
+        % aitem7, aitem6, aitem5, aitem4, aitem1, aitem2, aitem3, aitem3nd
         ?_E(0, er:lpushx(C, noneList, aitemZ)),
         ?_E(0, er:rpushx(C, noneList, aitemZ)),
         ?_E(9, er:linsert(C, listA, before, aitem5, aitemNew)),
-        % aitem7, aitem6, aitemNew, aitem5, aitem4, aitem1, aitem2, aitem3, aitemZ
+        % aitem7, aitem6, aitemNew, aitem5, aitem4, aitem1, aitem2, aitem3, aitem3nd
         ?_E(10, er:linsert(C, listA, 'after', aitem1, aitemNew2)),
-        % aitem7, aitem6, aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3, aitemZ
+        % aitem7, aitem6, aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3, aitem3nd
         ?_E(<<"aitem6">>, er:lindex(C, listA, 1)),
-        ?_E(<<"aitem1">>, er:lindex(C, listA, 5))
+        ?_E(<<"aitem1">>, er:lindex(C, listA, 5)),
+        % aitem7, aitem6, aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3, aitem3nd
+        ?_E([<<"listA">>, <<"aitem7">>], er:blpop(C, listA, 3000)),
+        % aitem6, aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3, aitem3nd
+        ?_E([<<"listA">>, <<"aitem3nd">>], er:brpop(C, listA, 3000)),
+        % aitem6, aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3
+        ?_E(<<"aitem6">>, er:lpop(C, listA)),
+        % aitemNew, aitem5, aitem4, aitem1, aitemNew2, aitem2, aitem3
+        ?_E(<<"aitem3">>, er:rpop(C, listA))
+        % aitemNew, aitem5, aitem4, aitem1, aitemNew2
+
         % ltrim
         % lset
         % lrem
-        % lpop
-        % rpop
-        % blpop
-        % brpop
         % rpoplpush
         % brpoplpush
       ]
