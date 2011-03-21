@@ -38,14 +38,14 @@ er_concurrency_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         % Changing both tests to 'inorder' causes test() to take ~16 seconds.
-        {inparallel, 
+        {inparallel,
            % generate and run 26 concurrent gets and make sure results work
           [?d(V, ?_E(V, er:get(C, K))) || {K, V} <- kv_pairs()]
         },
-        {inparallel, 
+        {inparallel,
           % generate and run 26 * 200 = 5200 concurrent gets and make sure results work
           [[?d(V, ?_E(V, er:get(C, K))) || {K, V} <- kv_pairs()]
             || _ <- lists:seq(1, 200)]

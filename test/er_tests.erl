@@ -19,7 +19,7 @@ er_basic_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         ?_E(false, er:exists(C, existing)),
         ?_E(ok,    er:set(C, existing, ralph)),
@@ -131,7 +131,7 @@ er_lists_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         % []
         ?_E(1,  er:rpush(C, listA, aitem1)),
@@ -179,7 +179,7 @@ er_sets_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         ?_E(true,  er:sadd(C, setA, amember1)),
         ?_E(false, er:sadd(C, setA, amember1)),
@@ -219,7 +219,7 @@ er_sorted_sets_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         ?_E(true,  er:zadd(C, zsetA, 10, amember1)),
         ?_E(false, er:zadd(C, zsetA, 10, amember1)),
@@ -266,7 +266,7 @@ er_hashes_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(C) -> 
+    fun(C) ->
       [
         ?_E(true,  er:hset(C, hashA, fieldA, valueA)),
         ?_E(true,  er:hset(C, hashA, fieldB, valueB)),
@@ -279,7 +279,7 @@ er_hashes_commands_test_() ->
         ?_E([<<"valueA1">>, <<"valueC">>, nil],
                      er:hmget(C, hashA, [fieldA, fieldC, fieldNone])),
         ?_E([nil, <<"valueA1">>, nil, <<"valueC">>, nil],
-                     er:hmget(C, hashA, [fieldZombie, fieldA, 
+                     er:hmget(C, hashA, [fieldZombie, fieldA,
                                          fieldDead, fieldC,
                                          fieldNone])),
         ?_E([<<"valueA1">>, <<"valueC">>],
@@ -291,8 +291,8 @@ er_hashes_commands_test_() ->
         ?_E(<<"valB">>, er:hget(C, hashC, fieldB)),
         ?_E(12,    er:hincrby(C, hashD, fieldAddr, 12)),
         ?_E(72,    er:hincrby(C, hashD, fieldAddr, 60)),
-        ?_E(true,  er:hexists(C, hashD, fieldAddr)), 
-        ?_E(false, er:hexists(C, hashD, fieldBddr)), 
+        ?_E(true,  er:hexists(C, hashD, fieldAddr)),
+        ?_E(false, er:hexists(C, hashD, fieldBddr)),
         ?_E(false, er:hexists(C, hashZ, fieldZ)),
         ?_E(true,  er:hdel(C, hashD, fieldAddr)),
         ?_E(false, er:hdel(C, hashD, fieldAddr)),
@@ -325,7 +325,7 @@ er_sorting_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(_C) -> 
+    fun(_C) ->
       [
         % sort
       ]
@@ -373,7 +373,7 @@ er_pubsub_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(_C) -> 
+    fun(_C) ->
       [
         % subscribe
         % unsubscribe
@@ -388,7 +388,7 @@ er_persistence_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,
     fun redis_cleanup/1,
-    fun(_C) -> 
+    fun(_C) ->
       [
         % save
         % bgsave
@@ -416,7 +416,7 @@ er_server_control_commands_test_() ->
   }.
 
 er_return_test_() ->
-  {inparallel, 
+  {inparallel,
     [
       ?_E(nil,      er:'redis-return-nil'(nil)),
       ?_E(ok,       er:'redis-return-status'([<<"ok">>])),
