@@ -108,13 +108,9 @@ Build:
 Testing
 -------
 NB: Tests run against a redis on port 6991.
-Running tests WILL DELETE ALL DATA on your port 6991 redis.
-        ./rebar compile
-        cd test
-        erlc *.erl
-        erl -pa ../ebin
-         1> er_tests:test().
-         2> er_concurrency_tests:test().
+Running tests will DELETE ALL DATA on your port 6991 redis.
+        rebar eunit skip_deps=true suite=er -v
+        rebar eunit skip_deps=true suite=er_concurrency_tests -v
 
 Next Steps
 ----------
