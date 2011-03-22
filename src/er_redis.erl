@@ -19,7 +19,7 @@ connect() -> start_link().
 connect(IP, Port) -> start_link(IP, Port).
 
 start_link() ->
-  connect("127.0.0.1", 6379).
+  start_link("127.0.0.1", 6379).
 
 start_link(IP, Port) ->
   gen_server:start_link(?MODULE, [IP, Port], []).
@@ -120,14 +120,8 @@ state_connect(#state{ip = IP, port = Port, socket = PrevSock} = State) ->
                 {packet, line}, {active, false},
                 {recbuf, 1024}],
   case gen_tcp:connect(IP, Port, SocketOpts) of
-    {ok, Socket} -> State#state{socket = Socket};
-    {error, eaddrinuse} -> 
-      error_logger:error_msg("No free ports.  Exiting ~p~n", [self()]),
-      {stop, normal, State};
-    Error ->
-      error_logger:error_msg("er connect failed: ~p~n", [Error]),
-      timer:sleep(380),
-      State#state{socket = undefined}
+      {ok, Socket} -> State#state{socket = Socket};
+    {error, Error} -> exit(self(), {er_connect_failed, Error, IP, Port})
   end.
 
 strip(B) when is_binary(B) ->
