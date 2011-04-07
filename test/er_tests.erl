@@ -405,6 +405,22 @@ er_persistence_commands_test_() ->
     end
   }.
 
+eru_test_() ->
+  {setup,
+    fun redis_setup_clean/0,
+    fun redis_cleanup/1,
+    fun(C) ->
+      [
+        ?_E(ok, er:hmset(C, foo, [one, two, three, four, five, six])),
+        ?_E([<<"one">>,<<"two">>,<<"three">>,
+             <<"four">>,<<"five">>, <<"six">>], er:hgetall(C, foo)),
+        ?_E(ok, eru:hcopy(C, foo, foo_copy)),
+        ?_E([<<"one">>,<<"two">>,<<"three">>,
+             <<"four">>,<<"five">>, <<"six">>], er:hgetall(C, foo_copy))
+      ]
+    end
+  }.
+
 er_server_control_commands_test_() ->
   {setup,
     fun redis_setup_clean/0,

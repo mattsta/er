@@ -2,7 +2,7 @@
  (export all))
 
 (eval-when-compile
-  (include-file "include/utils.lfe"))
+ (include-file "include/utils.lfe"))
 
 (include-file "include/utils.lfe")
 (include-file "include/utils-macro.lfe")
@@ -27,3 +27,6 @@
  ((server key 'hash)   (: er hgetall_k server key)))
 
 (make-key-generator-of-max-args 32)
+
+(defun hcopy (server from to)
+ (: er hmset server to (: er hgetall server from)))
