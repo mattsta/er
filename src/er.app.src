@@ -2,7 +2,7 @@
  [
   {description, "Erlang Redis Library"},
   % version numbers are: {redis.version}-er-{er.version}
-  {vsn, "2.4-er-1.5"},
+  {vsn, "2.4-er-1.5.3"},
   {modules, []},
   {registered, [er_sup]},
   {applications, [
