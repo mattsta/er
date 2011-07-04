@@ -42,10 +42,10 @@ start_link(GenServerName, IP, Port, SocketCount, Strategy)
 
 % Without names
 start_link_nameless(IP, Port) ->
-  start_link(IP, Port, 25).
+  start_link_nameless(IP, Port, 25).
 
 start_link_nameless(IP, Port, SocketCount) ->
-  start_link(IP, Port, SocketCount, crash).
+  start_link_nameless(IP, Port, SocketCount, crash).
 
 start_link_nameless(IP, Port, SocketCount, Strategy) ->
   gen_server:start_link(?MODULE, [IP, Port, SocketCount, Strategy], []).
