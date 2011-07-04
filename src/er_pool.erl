@@ -158,7 +158,7 @@ handle_info({'EXIT', _Pid, {er_connect_failed, _, _, _}} = Error, State) ->
   run_error_strategy(Error, State);
 
 % An er_redis died because of some other error.  Remove it from list of servers.
-handle_info({'EXIT', Pid, _Reason} = Err,
+handle_info({'EXIT', Pid, _Reason},
     #state{available=Available, reserved=Reserved} = State) ->
   try connect(State) of
     Connected ->
