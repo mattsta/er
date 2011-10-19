@@ -109,8 +109,8 @@ er_basic_commands_test_() ->
         ?_E(1, er:getbit(C, binaryint, 7)),
         % nothinghere.  substr got renamed getrange in redis 2.2
         % getrange is now just an alias to substr in redis
-        ?_E(nil, er:getrange(C, nothinghere, 1, 3)),
-        ?_E(nil, er:substr(C, nothinghere, 1, 3)),
+        ?_E(<<>>, er:getrange(C, nothinghere, 1, 3)),
+        ?_E(<<>>, er:substr(C, nothinghere, 1, 3)),
         % rangekey tests
         ?_E(ok,  er:set(C, rangekey, "Hello")),
         ?_E(<<"ell">>, er:getrange(C, rangekey, 1, 3)),
@@ -121,8 +121,8 @@ er_basic_commands_test_() ->
         ?_E(13, er:setrange(C, rangeemptykey, 3, "Empty Test")),
         ?_E(<<0,0,0,"Empty Test">>, er:get(C, rangeemptykey)),
         % reading past the length of a string
-        ?_E(nil, er:getrange(C, rangekey, 64, 32)),
-        ?_E(nil, er:substr(C, rangekey, 64, 32))
+        ?_E(<<>>, er:getrange(C, rangekey, 64, 32)),
+        ?_E(<<>>, er:substr(C, rangekey, 64, 32))
       ]
     end
   }.
