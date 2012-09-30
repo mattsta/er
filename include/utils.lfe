@@ -16,7 +16,7 @@
   ((c) (when (is_list c)) c)
   ((c) (when (is_atom c)) (atom_to_list c))
   ((c) (when (is_integer c)) (integer_to_list c))
-  ((c) (when (is_binary c)) (: unicode characters_to_list c)))
+  ((c) (when (is_binary c)) (: unicode characters_to_list (binary_to_list c))))
 (defun ll
  ((c) (when (is_list c))
   (: lists map (fun l 1) c))) ;(lc ((<- element c)) (l element))))
