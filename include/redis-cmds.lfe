@@ -258,10 +258,10 @@
 ;; Commands operating on sorted sets (zsets, Redis version >= 1.1) ;;
 
 ; Add the specified member to the Sorted Set value at key or update the score if it already exist
-(redis-cmd-i-tf zadd (_key_ _score_ _member_))
+(redis-cmd-i zadd (_key_ _score_ _member_))
 
 ; Remove the specified member from the Sorted Set value at key
-(redis-cmd-i-tf zrem (_key_ _member_))
+(redis-cmd-i zrem (_key_ _member_))
 
 ; If the member already exists increment its score by _increment_, otherwise add the member setting _increment_ as score
 (redis-cmd-i zincrby (_key_ _increment_ _member_))
