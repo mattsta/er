@@ -66,6 +66,7 @@
   ([(#b("nan"))] 'nan)
   ([x] (when (is_integer x)) x)
   ([(tuple 'ok x)] (when (is_integer x)) x)
+  ([(tuple 'ok 'nil)] 'nil)
   ([(tuple 'ok #b("inf"))] 'inf)
   ([(tuple 'ok #b("-inf"))] '-inf)
   ([(tuple 'ok #b("nan"))] 'nan)
