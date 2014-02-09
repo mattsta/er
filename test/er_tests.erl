@@ -227,12 +227,12 @@ er_sorted_sets_commands_test_() ->
     fun redis_cleanup/1,
     fun(C) ->
       [
-        ?_E(true,  er:zadd(C, zsetA, 10, amember1)),
-        ?_E(false, er:zadd(C, zsetA, 10, amember1)),
-        ?_E(true,  er:zadd(C, zsetA, 10, amember2)),
-        ?_E(true,  er:zadd(C, zsetA, 10, amember3)),
-        ?_E(true,  er:zrem(C, zsetA, amember3)),
-        ?_E(false, er:zrem(C, zsetA, amembernone)),
+        ?_E(1,     er:zadd(C, zsetA, 10, amember1)),
+        ?_E(0,     er:zadd(C, zsetA, 10, amember1)),
+        ?_E(1,     er:zadd(C, zsetA, 10, amember2)),
+        ?_E(1,     er:zadd(C, zsetA, 10, amember3)),
+        ?_E(1,     er:zrem(C, zsetA, amember3)),
+        ?_E(0,     er:zrem(C, zsetA, amembernone)),
         ?_E(20,    er:zincrby(C, zsetA, 10, amember1)),
         ?_E(-20,   er:zincrby(C, zsetA, -40, amember1)),
         ?_E(0,     er:zrank(C, zsetA, amember1)),
