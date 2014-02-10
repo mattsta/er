@@ -4,7 +4,10 @@ er: erlang redis
 Status
 ------
 er is production ready.
-er is feature complete with redis-2.2 as of antirez/redis@59aee5513d27fdf2d24499f35611093fa0fab3fb 
+
+er is command complete with redis-2.8.5.
+
+er is adding new Redis features soon (Sentinel, Cluster, ...).
 
 Code Guide
 ----------
@@ -12,14 +15,11 @@ Code Guide
 
 `er.lfe` creates a module where the first parameter of all commands is the
 redis connection (the conenction is either a `er_redis` PID or `er_pool` name):
-        {ok, Client} = er_redis:connect().
-        er:set(Client, <<"chevron">>, <<"locked">>).
 
-`erp.lfe` creates a parameterized module where the redis connection is carried
-through all the commands:
-        {ok, Client} = er_redis:connect().
-        RedisClient = erp:new(Client).
-        RedisClient:set(<<"artist">>, <<"pallett">>).
+```erlang
+    {ok, Client} = er_redis:connect().
+    er:set(Client, <<"chevron">>, <<"locked">>).
+```
 
 `er_pool.erl` gives you a centrally managed connection pool of redis clients.
 Create a named pool, then use regular `er` commands against it.  If you use
@@ -29,49 +29,54 @@ use. When the client is done with exclusive operations, the client is returned
 to the general connection pool.
 
 ### Connect and use anonymous pid
-        {ok, Client} = er_pool:start_link().
-        er:set(Client, italian, greyhound).
-        <<"greyhound">> = er:get(Client, italian).
+```erlang
+    {ok, Client} = er_pool:start_link().
+    er:set(Client, italian, greyhound).
+    <<"greyhound">> = er:get(Client, italian).
+```
 
 ### Connect and use named pool (no need for pid tracking)
-        er_pool:start_link(userdb).
-        er:set(userdb, hash_value_1, erlang:md5(<<"hash this">>).
-        er:lpush(userdb, updates, hash_value_1).
+```erlang
+    er_pool:start_link(userdb).
+    er:set(userdb, hash_value_1, erlang:md5(<<"hash this">>).
+    er:lpush(userdb, updates, hash_value_1).
+```
 
 ### Transaction support (multi/exec/discard)
-        er_pool:start_link(txn_readme_test).
-        TxnFun = fun(Cxn) ->
-                   er:setnx(Cxn, hello, there),
-                   er:incr(Cxn, "counter:uid")
-                 end,
-        er:er_transaction(txn_readme_test, TxnFun).
+```erlang
+    er_pool:start_link(txn_readme_test).
+    TxnFun = fun(Cxn) ->
+               er:setnx(Cxn, hello, there),
+               er:incr(Cxn, "counter:uid")
+             end,
+    er:er_transaction(txn_readme_test, TxnFun).
+```
 
 ### Blocking Pop
 Blocking pop blocks the current process until Timeout (600 seconds below) or until
   an item becomes available.  Blocking operations return the atom nil on timeout.
-        er_pool:start_link(workqueue_pool).
-        er:blpop(workqueue_pool, blocked_key, 600).
+
+```erlang
+    er_pool:start_link(workqueue_pool).
+    er:blpop(workqueue_pool, blocked_key, 600).
+```
 
 ### PubSub
-        er_pool:start_link(announcements).
-        % Subscribe to key `another`.  Returns a pid and subscribe validation.
-        {SubClientPid, [subscribe, <<"another">>, 1]} = er:subscribe(announcements, another).
+```erlang
+    er_pool:start_link(announcements).
+    % Subscribe to key `another`.  Returns a pid and subscribe validation.
+    {SubClientPid, [subscribe, <<"another">>, 1]} = er:subscribe(announcements, another).
 
-        % To receive published messages, run a blocking receive.
-        % er_next blocks your current process until something is published.
-        % You can run er:er_next(SubClientPid) in a loop to consume all published messages.
-        [message, <<"bob">>, PublishedMessage] = er:er_next(SubClientPid).
+    % To receive published messages, run a blocking receive.
+    % er_next blocks your current process until something is published.
+    % You can run er:er_next(SubClientPid) in a loop to consume all published messages.
+    [message, <<"bob">>, PublishedMessage] = er:er_next(SubClientPid).
 
-        % Clean up when you are done to avoid leaking processes and sockets:
-        SubClientPid ! shutdown.
+    % Clean up when you are done to avoid leaking processes and sockets:
+    SubClientPid ! shutdown.
+```
 
 For per-command usage examples, see `test/er_tests.erl`.
-
-`er_redis.erl` was mainly taken from http://github.com/bmizerany/redis-erl/blob/master/src/redis.erl then
-heavily modified to fit my purposes better.  Only 20 to 30 lines of the original file survived.
-
-Since `er` and `erp` perform the same functions only with slightly different
-interfaces, most of their code is shared by directly including common files.
 
 See files `include/{utils,utils-macro,redis-cmds,redis-return-types}.lfe`:
 
@@ -100,9 +105,11 @@ example:
 Building
 --------
 Download LFE:
+
         ./rebar get-deps
 
 Build:
+
         ./rebar compile
 
 Testing
