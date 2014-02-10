@@ -4,6 +4,8 @@
 ;;           return tuples/proplists/maps instead of
 ;;           just lists with items paired mod 2.
 
+(defun default-return (what) what)
+
 (defun redis-return-nil (x) x)
 
 (defun redis-return-status 
@@ -15,6 +17,17 @@
     ; we trust redis to have a stable list of return atoms
     (list_to_atom (: string to_lower (binary_to_list x))))
   ([(tuple pid status)] (when (is_pid pid)) (tuple pid (redis-return-status status))))
+
+; You can increment by an integer and get an integer back, so this has
+; to do the usual erlang dance of "catch error, re-parse as integer"
+(defun redis-return-float
+ ([(tuple 'ok binary-float)]
+   (try
+    (list_to_float (binary_to_list binary-float))
+    (catch
+      ; lfe catch pattern is TYPE-ARG VALUE-ARG IGNORE-ARG
+     ((tuple 'error 'badarg o) (list_to_integer (binary_to_list binary-float))))))
+ ([(tuple 'error err)] (throw (tuple 'redis_error err))))
 
 (defun redis-return-integer 
   ([(list #b("inf"))] 'inf)

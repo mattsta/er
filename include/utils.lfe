@@ -6,7 +6,8 @@
   ((c) (when (is_binary c))  (a (l c))))
 (defun la
  ((c) (when (andalso (is_list c) (is_list (car c))))
-  (: lists map (fun a 1) c))) ;(lc ((<- element c)) (a element))))
+  (: lists map (fun a 1) c)) ;(lc ((<- element c)) (a element))))
+ ((c) c))
 
 (defun mk-a (c d)
   (a (: lists flatten (cons (l c) (l d)))))

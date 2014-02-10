@@ -4,19 +4,56 @@
 (eval-when-compile 
   (include-file "include/utils.lfe"))
 
-(include-file "include/utils-macro.lfe")
+; "fixed" stands for a fixed number of arguments, not "fixed" as in
+; the other verions of this are broken
+(defmacro redis-cmd-mk-fixed
+ ([command-name command-args wrapper-fun-name]
+  (let* ((cmd (b command-name)))
+   `(defun ,command-name (client ,@command-args)
+    (,wrapper-fun-name (: er_redis q client (list ,cmd ,@command-args))))))
+ ([fun-name command-name command-args wrapper-fun-name]
+  (let* ((cmd (b command-name)))
+   `(defun ,fun-name (client ,@command-args)
+    (,wrapper-fun-name (: er_redis q client (list ,cmd ,@command-args)))))))
+
+; -skip allows us to define a fixed-position function defined elsewhere
+; yet still use our multi-args after a certain length.
+(defmacro redis-cmd-mk-skip [n command-name command-args wrapper-fun-name]
+ (let* ((cmd (b command-name))
+        (arg-names (: lists map (fun xn 1) (: lists seq (length command-args) 16)))
+        (funs (lc ((<- args arg-names))
+               (cond
+                ((== n (length args)) 'removed)
+                (else
+               `(defun ,command-name (client ,@(la args))
+                 (,wrapper-fun-name (: er_redis q client (list ,cmd ,@(la args))))))))))
+             ; remove all empty forms above from being progn'd
+   `(progn ,@(: lists filter (match-lambda (['removed] 'false) ([_] 'true)) funs))))
 
 (defmacro redis-cmd-mk
-  ((command-name command-args wrapper-fun-name)
+  ([command-name () wrapper-fun-name]
     (let* ((cmd (b command-name)))
-     `(defun ,command-name (client ,@command-args)
-        (,wrapper-fun-name (: er_redis q client (list ,cmd ,@command-args))))))
-  ((fun-name command-name command-args wrapper-fun-name)
-    (let* ((cmd (b command-name)))
-     `(defun ,fun-name (client ,@command-args)
-        (,wrapper-fun-name (: er_redis q client (list ,cmd ,@command-args)))))))
+     `(defun ,command-name (client)
+       (,wrapper-fun-name (: er_redis q client (list ,cmd))))))
+  ([command-name command-args wrapper-fun-name]
+    (let* ((cmd (b command-name))
+           (arg-names (: lists map (fun xn 1) (: lists seq (length command-args) 16)))
+           (funs (lc ((<- args arg-names))
+                  `(defun ,command-name (client ,@(la args))
+                    (,wrapper-fun-name (: er_redis q client (list ,cmd ,@(la args))))))))
+      `(progn ,@funs)))
+  ([fun-name command-name command-args wrapper-fun-name]
+    (let* ((cmd (b command-name))
+           (arg-names (: lists map (fun xn 1) (: lists seq (length command-args) 16)))
+           (funs (lc ((<- args arg-names))
+                 `(defun ,fun-name (client ,@(la args))
+                   (,wrapper-fun-name (: er_redis q client (list ,cmd ,@(la args))))))))
+     `(progn ,@funs))))
 
 (include-file "include/redis-return-types.lfe")
+
+(include-file "include/utils-macro.lfe")
+
 (include-file "include/redis-cmds.lfe")
 
 (defun er_next (client)

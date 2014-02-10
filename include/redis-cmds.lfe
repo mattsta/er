@@ -23,69 +23,69 @@
 (redis-cmd-n quit)
 
 ; simple password authentication if enabled
-(redis-cmd-s auth)
+(redis-cmd-s-fixed auth (_pass_))
 
 ;; Connection commands ;;
 
 ; ping the server
-(redis-cmd-s ping)
+(redis-cmd-s-fixed ping)
 
 ; echo the given string
-(redis-cmd-b echo (_msg_))
+(redis-cmd-b-fixed echo (_msg_))
 
 ;; Commands operating on all the kind of values ;;
 
 ; test if a key exists
 ; returns true on exists; false on not exists
-(redis-cmd-i-tf exists (_key_))
+(redis-cmd-i-tf-fixed exists (_key_))
 
 ; delete a key
 ; returns number of keys deleted: 0 to N
 (redis-cmd-i del (_keys_))
 
 ; return the type of the value stored at key
-(redis-cmd-s type (_key_))
+(redis-cmd-s-fixed type (_key_))
 
 ; return all the keys matching a given pattern
-(redis-cmd-b keys (_pattern_))
+(redis-cmd-b-fixed keys (_pattern_))
 
 ; return a random key from the key space
-(redis-cmd-l randomkey)
+(redis-cmd-l-fixed randomkey)
 
 ; rename the old key in the new one, destroing the newname key if it already exists
 ; > er:rename(C, bob2, bob3).
 ; ** exception throw: {redis_error,<<"ERR no such key">>}
 ; > er:rename(C, bob3, bob3).
 ; ** exception throw: {redis_error,<<"ERR source and destination objects are the same">>}
-(redis-cmd-s rename (_oldname_ _newname_))
+(redis-cmd-s-fixed rename (_oldname_ _newname_))
 
 ; rename the old key in the new one, if the newname key does not already exist
-(redis-cmd-i-tf renamenx (_oldname_ _newname_))
+(redis-cmd-i-tf-fixed renamenx (_oldname_ _newname_))
 
 ; return the number of keys in the current db
-(redis-cmd-i dbsize)
+(redis-cmd-i-fixed dbsize)
 
 ; set a time to live in seconds on a key
-(redis-cmd-i-tf expire (_key_ _seconds-forward_))
-(redis-cmd-i-tf expireat (_key_ _unixtime_))
+(redis-cmd-i-tf-fixed expire (_key_ _seconds-forward_))
+(redis-cmd-i-tf-fixed expireat (_key_ _unixtime_))
 
 ; remove a previously set expire
-(redis-cmd-i-tf persist (_key_))
+(redis-cmd-i-tf-fixed persist (_key_))
 
 ; get the time to live in seconds of a key
-(redis-cmd-i ttl (_key_))
+(redis-cmd-i-fixed ttl (_key_))
 
 ; Select the DB having the specified index
-(redis-cmd-s select (_index_))
+(redis-cmd-s-fixed select (_index_))
 
 ; Move the key from the currently selected DB to the DB having as index dbindex
-(redis-cmd-i move (_key_ _dbindex_))
+(redis-cmd-i-fixed move (_key_ _dbindex_))
 
 ; Remove all the keys of the currently selected DB
-(redis-cmd-s flushdb)
+(redis-cmd-s-fixed flushdb)
 
 ; Remove all the keys from all the databases
-(redis-cmd-s flushall)
+(redis-cmd-s-fixed flushall)
 
 
 ;; Commands operating on string values ;;
@@ -94,20 +94,20 @@
 (redis-cmd-s set (_key_ _value_))
 
 ; return the string value of the key
-(redis-cmd-b get (_key_))
+(redis-cmd-b-fixed get (_key_))
 
 ; set a key to a string returning the old value of the key
-(redis-cmd-b getset (_key_ _value_))
+(redis-cmd-b-fixed getset (_key_ _value_))
 
 ; multi-get, return the strings values of the keys
 ; _key1_ _key2_ ... _keyN_
 (redis-cmd-m mget (_keys_))
 
 ; set a key to a string value if the key does not exist
-(redis-cmd-i-tf setnx (_key_ _value_))
+(redis-cmd-i-tf-fixed setnx (_key_ _value_))
 
 ; Set+Expire combo command
-(redis-cmd-s setex (_key_ _time_ _value_))
+(redis-cmd-s-fixed setex (_key_ _time_ _value_))
 
 ; set a multiple keys to multiple values in a single atomic operation
 ; _key1_ _value1_ _key2_ _value2_ ... _keyN_ _valueN_
@@ -118,31 +118,31 @@
 (redis-cmd-i-tf msetnx (_key-value-pairs_))
 
 ; increment the integer value of key
-(redis-cmd-i incr (_key_))
+(redis-cmd-i-fixed incr (_key_))
 
 ; increment the integer value of key by integer
-(redis-cmd-i incrby (_key_ _integer_))
+(redis-cmd-i-fixed incrby (_key_ _integer_))
 
 ; decrement the integer value of key
-(redis-cmd-i decr (_key_))
+(redis-cmd-i-fixed decr (_key_))
 
 ; decrement the integer value of key by integer
-(redis-cmd-i decrby (_key_ _integer_))
+(redis-cmd-i-fixed decrby (_key_ _integer_))
 
 ; append the specified string to the string stored at key
-(redis-cmd-i append (_key_ _value_))
+(redis-cmd-i-fixed append (_key_ _value_))
 
 ; return a substring out of a larger string
-(redis-cmd-b substr (_key_ _start_ _end_))   ; substr = getrange in 2.2+
-(redis-cmd-b getrange (_key_ _start_ _end_)) ; getrange = substr for redis 2.2+
+(redis-cmd-b-fixed substr (_key_ _start_ _end_))   ; substr = getrange in 2.2+
+(redis-cmd-b-fixed getrange (_key_ _start_ _end_)) ; getrange = substr for redis 2.2+
 
-(redis-cmd-i setrange (_key_ _start_ _end_))
+(redis-cmd-i-fixed setrange (_key_ _start_ _end_))
 
-(redis-cmd-i getbit (_key_ _position_))
-(redis-cmd-i setbit (_key_ _position_ _value_))
+(redis-cmd-i-fixed getbit (_key_ _position_))
+(redis-cmd-i-fixed setbit (_key_ _position_ _value_))
 
 ; return the length of a string
-(redis-cmd-i strlen (_key_))
+(redis-cmd-i-fixed strlen (_key_))
 
 ;; Commands operating on lists ;;
 
@@ -153,40 +153,40 @@
 (redis-cmd-i lpush (_key_ _value_))
 
 ; Return the length of the List value at key
-(redis-cmd-i llen (_key_))
+(redis-cmd-i-fixed llen (_key_))
 
 ; Return a range of elements from the List at key
-(redis-cmd-m lrange (_key_ _start_ _end_))
+(redis-cmd-m-fixed lrange (_key_ _start_ _end_))
 
 ; Trim the list at key to the specified range of elements
-(redis-cmd-s ltrim (_key_ _start_ _end_))
+(redis-cmd-s-fixed ltrim (_key_ _start_ _end_))
 
 ; Return the element at index position from the List at key
-(redis-cmd-b lindex (_key_ _index_))
+(redis-cmd-b-fixed lindex (_key_ _index_))
 
 ; Push on the left if the list exists.
 ; Returns number of elements in list.  Returns zero if list isn't created.
-(redis-cmd-i lpushx (_key_ _value_))
+(redis-cmd-i-fixed lpushx (_key_ _value_))
 
 ; Push on the right if the list exists.
 ; Returns number of elements in list.  Returns zero if list isn't created.
-(redis-cmd-i rpushx (_key_ _value_))
+(redis-cmd-i-fixed rpushx (_key_ _value_))
 
 ; Insert before or after a value in a list
 ; Returns the number of elements in list
-(redis-cmd-i linsert (_key_ _before_or_after_ _existing_value_ _new_value_))
+(redis-cmd-i-fixed linsert (_key_ _before_or_after_ _existing_value_ _new_value_))
 
 ; Set a new value as the element at index position of the List at key
-(redis-cmd-s lset (_key_ _index_ _value_))
+(redis-cmd-s-fixed lset (_key_ _index_ _value_))
 
 ; Remove the first-N, last-N, or all the elements matching value from the List at key
-(redis-cmd-i lrem (_key_ _count_ _value_))
+(redis-cmd-i-fixed lrem (_key_ _count_ _value_))
 
 ; Return and remove (atomically) the first element of the List at key
-(redis-cmd-b lpop (_key_))
+(redis-cmd-b-fixed lpop (_key_))
 
 ; Return and remove (atomically) the last element of the List at key
-(redis-cmd-b rpop (_key_))
+(redis-cmd-b-fixed rpop (_key_))
 
 ; Blocking LPOP
 ; _key1_ _key2_ ... _keyN_ _timeout_
@@ -197,10 +197,10 @@
 (redis-cmd-m brpop (_keys_ _timeout_))
 
 ; Return and remove (atomically) the last element of the source List stored at _srckey_ and push the same element to the destination List stored at _dstkey_
-(redis-cmd-b rpoplpush (_srckey_ _dstkey_))
+(redis-cmd-b-fixed rpoplpush (_srckey_ _dstkey_))
 
 ; Blocking rpoplpush
-(redis-cmd-b brpoplpush (_srckey_ _dstkey_))
+(redis-cmd-b-fixed brpoplpush (_srckey_ _dstkey_))
 
 
 
@@ -213,16 +213,16 @@
 (redis-cmd-i-tf srem (_key_ _member_))
 
 ; Remove and return (pop) a random element from the Set value at key
-(redis-cmd-b spop (_key_))
+(redis-cmd-b-fixed spop (_key_))
 
 ; Move the specified member from one Set to another atomically
-(redis-cmd-i-tf smove (_srckey_ _dstkey_ _member_))
+(redis-cmd-i-tf-fixed smove (_srckey_ _dstkey_ _member_))
 
 ; Return the number of elements (the cardinality) of the Set at key
-(redis-cmd-i scard (_key_))
+(redis-cmd-i-fixed scard (_key_))
 
 ; Test if the specified value is a member of the Set at key
-(redis-cmd-i-tf sismember (_key_ _member_))
+(redis-cmd-i-tf-fixed sismember (_key_ _member_))
 
 ; Return the intersection between the Sets stored at key1, key2, ..., keyN
 ; _key1_ _key2_ ... _keyN_
@@ -249,7 +249,7 @@
 (redis-cmd-s sdiffstore (_dstkey_ _keys_))
 
 ; Return all the members of the Set value at key
-(redis-cmd-m smembers (_key_))
+(redis-cmd-m-fixed smembers (_key_))
 
 ; Return a random member of the Set value at key
 (redis-cmd-b srandmember (_key_))
@@ -264,44 +264,47 @@
 (redis-cmd-i zrem (_key_ _member_))
 
 ; If the member already exists increment its score by _increment_, otherwise add the member setting _increment_ as score
-(redis-cmd-i zincrby (_key_ _increment_ _member_))
+(redis-cmd-i-fixed zincrby (_key_ _increment_ _member_))
 
 ; Return the rank (or index) or _member_ in the sorted set at _key_, with scores being ordered from low to high
 ; NB: Docs say this returns bulk, but we treat it as returning an integer
-(redis-cmd-i zrank (_key_ _member_))
+(redis-cmd-i-fixed zrank (_key_ _member_))
 
 ; Return the rank (or index) or _member_ in the sorted set at _key_, with scores being ordered from high to low
 ; NB: Docs say this returns bulk, but we treat it as returning an integer
-(redis-cmd-i zrevrank (_key_ _member_))
+(redis-cmd-i-fixed zrevrank (_key_ _member_))
 
 ; Return a range of elements from the sorted set at key
-(redis-cmd-m zrange (_key_ _start_ _end_))
+(redis-cmd-m-fixed zrange (_key_ _start_ _end_))
 
 ; Return a range of elements from the sorted set at key, exactly like ZRANGE, but the sorted set is ordered in traversed in reverse order, from the greatest to the smallest score
-(redis-cmd-m zrevrange (_key_ _start_ _end_))
+(redis-cmd-m-fixed zrevrange (_key_ _start_ _end_))
 
 ; Return all the elements with score >= min and score <= max (a range query) from the sorted set
-(redis-cmd-m zrangebyscore (_key_ _min_ _max_))
+(redis-cmd-m-fixed zrangebyscore (_key_ _min_ _max_))
+
+(redis-cmd-m-fixed zrevrangebyscore (_key_ _max_ _min_))
 
 ; Count the number of elements of a sorted set with a score that lays within a given interval
-(redis-cmd-i zcount (_key_ _lower_score_ _upper_score_))
+(redis-cmd-i-fixed zcount (_key_ _lower_score_ _upper_score_))
 
 ; Return the cardinality (number of elements) of the sorted set at key
-(redis-cmd-i zcard (_key_))
+(redis-cmd-i-fixed zcard (_key_))
 
 ; Return the score associated with the specified element of the sorted set at key
-(redis-cmd-b zscore (_key_ _element_))
+(redis-cmd-b-fixed zscore (_key_ _element_))
 
 ; Remove all the elements with rank >= min and rank <= max from the sorted set
-(redis-cmd-i zremrangebyrank (_key_ _min_ _max_))
+(redis-cmd-i-fixed zremrangebyrank (_key_ _min_ _max_))
 
 ; Remove all the elements with score >= min and score <= max from the sorted set
-(redis-cmd-i zremrangebyscore (_key_ _min_ _max_))
+(redis-cmd-i-fixed zremrangebyscore (_key_ _min_ _max_))
 
 ;; ER-ONLY functions.
-(redis-cmd-m-kl zrange zrange (_key_ _start_ _end_ withscores))
-(redis-cmd-m-kl zrevrange zrevrange (_key_ _start_ _end_ withscores))
-(redis-cmd-m-kl zrangebyscore zrangebyscore (_key_ _min_ _max_ withscores))
+(redis-cmd-m-kl-fixed zrange (_key_ _start_ _end_ withscores))
+(redis-cmd-m-kl-fixed zrevrange (_key_ _start_ _end_ withscores))
+(redis-cmd-m-kl zrangebyscore (_key_ _min_ _max_ withscores)) ; also [LIMIT offset count]
+(redis-cmd-m-kl zrevrangebyscore (_key_ _max_ _min_ withscores)) ; also [LIMIT offset count]
 ;; END ER_ONLY functions.
 
 ; Perform a union or intersection over a number of sorted sets with optional weight and aggregate`
@@ -312,10 +315,10 @@
 ;; Commands operating on hashes ;;
 
 ; Set the hash field to the specified value. Creates the hash if needed.
-(redis-cmd-i-tf hset (_key_ _field_ _value_))
+(redis-cmd-i-tf-fixed hset (_key_ _field_ _value_))
 
 ; Retrieve the value of the specified hash field.
-(redis-cmd-b hget (_key_ _field_))
+(redis-cmd-b-fixed hget (_key_ _field_))
 
 ; Set the hash fields to their respective values.
 ; _key1_ _field1_ ... _fieldN_
@@ -329,28 +332,28 @@
 (redis-cmd-i hincrby (_key_ _field_ _integer_))
 
 ; Test for existence of a specified field in a hash
-(redis-cmd-i-tf hexists (_key_ _field_))
+(redis-cmd-i-tf-fixed hexists (_key_ _field_))
 
 ; Remove the specified field from a hash
 (redis-cmd-i-tf hdel (_key_ _field_))
 
 ; Return the number of items in a hash.
-(redis-cmd-i hlen (_key_))
+(redis-cmd-i-fixed hlen (_key_))
 
 ; Return all the fields in a hash.
-(redis-cmd-m hkeys (_key_))
+(redis-cmd-m-fixed hkeys (_key_))
 
 ; Return all the values in a hash.
-(redis-cmd-m hvals (_key_))
+(redis-cmd-m-fixed hvals (_key_))
 
 ; Return all the fields and associated values in a hash.
-(redis-cmd-m hgetall (_key_))
+(redis-cmd-m-fixed hgetall (_key_))
 
 ;; ER-ONLY functions.
 ; Return all the fields of a hash as a proplist (e.g. [{atom, Binary}])
-(redis-cmd-m-pl hgetall_p hgetall (_key_))
+(redis-cmd-m-pl-fixed hgetall_p hgetall (_key_))
 ; Return all the fields of a hash as a keylist (e.g. [{Binary, Binary}])
-(redis-cmd-m-kl hgetall_k hgetall (_key_))
+(redis-cmd-m-kl-fixed hgetall_k hgetall (_key_))
 ;; END ER_ONLY functions.
 
 ;; Sorting ;;
@@ -362,49 +365,113 @@
 ;; Transactions ;;
 
 ; Redis atomic transactions
-(redis-cmd-s multi)
-(redis-cmd-o exec) ; return the redis return values without translation (?)
-(redis-cmd-s discard)
+(redis-cmd-s-fixed multi)
+(redis-cmd-o-fixed exec) ; return the redis return values without translation (?)
+(redis-cmd-s-fixed discard)
 
 ;; Publish/Subscribe  ;;
 
 ; Redis Public/Subscribe messaging paradigm implementation
 (redis-cmd-strip subscribe (_channels_))
 (redis-cmd-o unsubscribe (_channels_))
-(redis-cmd-o unsubscribe)
+(redis-cmd-o-fixed unsubscribe)
 (redis-cmd-strip psubscribe (_channel-patterns_))
 (redis-cmd-o punsubscribe (_channel-patterns_))
-(redis-cmd-o punsubscribe)
-(redis-cmd-i publish (_channel_ _msg_))
+(redis-cmd-o-fixed punsubscribe)
+(redis-cmd-i-fixed publish (_channel_ _msg_))
 
 ;; Persistence control commands ;;
 
 ; Synchronously save the DB on disk
-(redis-cmd-s save)
+(redis-cmd-s-fixed save)
 
 ; Asynchronously save the DB on disk
-(redis-cmd-s bgsave)
+(redis-cmd-s-fixed bgsave)
 
 ; Get and/or set configuration parameters
-(redis-cmd-s config (_getset_ _params_and_or_values_))
+(redis-cmd-s-fixed config (_operation_)) ; covers RESETSTAT | REWRITE
+(redis-cmd-b-fixed config (_get_ _param_))
+(redis-cmd-s-fixed config (_set _param_ _value_))
 
 ; Return the UNIX time stamp of the last successfully saving of the dataset on disk
-(redis-cmd-i lastsave)
+(redis-cmd-i-fixed lastsave)
 
 ; Synchronously save the DB on disk, then shutdown the server
-(redis-cmd-s shutdown)
+(redis-cmd-s-fixed shutdown)
 
 ; Rewrite the append only file in background when it gets too big
-(redis-cmd-s bgrewriteaof)
+(redis-cmd-s-fixed bgrewriteaof)
 
 
 ;; Remote server control commands ;;
 
 ; Provide information and statistics about the server
-(redis-cmd-b info)
+(redis-cmd-b-fixed info)
 
 ; Dump all the received requests in real time
-(redis-cmd-o monitor)
+(redis-cmd-o-fixed monitor)
 
 ; Change the replication settings
-(redis-cmd-s slaveof)
+(redis-cmd-s-fixed slaveof (_ip_ _port_))
+
+;; bulk addition of new untested commands
+
+;; Cluster / Replication commands
+(newcmd asking 0)
+(newcmd cluster -1)
+(newcmd migrate -5)
+(newcmd readonly 0)
+(newcmd readwrite 0)
+(newcmd replconf 0)
+(newcmd restore -3)
+(newcmd sync 0)
+(newcmd time 0)
+(newcmd restore-asking -3)
+(newcmd watch -1)
+(newcmd unwatch 0)
+(newcmd wait 2)  ; you shouldn't call wait directly
+
+;; Debugging / Info
+(newcmd debug -1)
+(redis-cmd-strip-fixed dump (_key_))
+(redis-cmd-b-fixed client (_op_)) ; GETNAME | LIST
+(redis-cmd-b-fixed client (_op_ _arg_)) ; SETNAME name | KILL ip:port
+(redis-cmd-m object (_type-descriptor_))
+(newcmd slowlog -1)
+
+;; scanning
+(newcmd hscan -2)
+(newcmd sscan -2)
+(newcmd zscan -2)
+(newcmd scan -1)
+
+;; bit ops
+(newcmd bitcount -1)
+(newcmd bitop -3)
+
+;; scripting
+(newcmd eval -2)
+(newcmd evalname -2)
+(newcmd evalsha -2)
+(newcmd script -1)
+(newcmd spsubscribe -2)
+(newcmd spunsubscribe -2)
+(newcmd ssubscribe -2)
+(newcmd sunsubscribe -2)
+
+;; hash additions
+(redis-cmd-i-fixed hsetnx (_key_ _field_ _nxval_))
+(redis-cmd-f-fixed hincrbyfloat (_key_ _field_ _incrby_))
+
+;; other floaty ops
+(redis-cmd-f-fixed incrbyfloat (_key_ _incrby_))
+
+;; pops
+(newcmd pexpire 2)
+(newcmd pexpireat 2)
+(newcmd psetex 3)
+(newcmd psync 2)
+(newcmd pttl 1)
+
+;; pubsub
+(newcmd pubsub -1)
