@@ -1,0 +1,14 @@
+{application, er,
+ [
+  {description, "Erlang Redis Library"},
+  % version numbers are: {redis.version}-er-{er.version}
+  {vsn, "2.2-er-1.2"},
+  {modules, []},
+  {registered, [er_sup]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {er_app, []}},
+  {env, []}
+ ]}.

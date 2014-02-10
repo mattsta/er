@@ -1,0 +1,7 @@
+.hg/
+.hgignore
+*.beam
+tags
+deps/
+.eunit/
+ebin/
